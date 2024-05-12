@@ -1,4 +1,4 @@
-This is example for loging function in NodeJS. 
+This is example for logging function in NodeJS. 
 You can run this project by command:
 ```
 npm run dev
