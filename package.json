@@ -11,6 +11,7 @@
   "author": "Duy Dang Code",
   "license": "ISC",
   "dependencies": {
+    "discord.js": "^14.15.2",
     "express": "^4.19.2",
     "uuid": "^9.0.1",
     "winston": "^3.13.0",
