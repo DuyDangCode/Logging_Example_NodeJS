@@ -1,10 +1,10 @@
 const winston = require('winston')
 require('winston-daily-rotate-file')
 
-class MyLogger {
+class WinstonLogger {
   static getInstance() {
     if (!this.instance) {
-      this.instance = new MyLogger()
+      this.instance = new WinstonLogger()
     }
     return this.instance
   }
@@ -39,7 +39,7 @@ class MyLogger {
         new winston.transports.DailyRotateFile({
           dirname: 'logs/error',
           filename: 'logs/application-%DATE%.log',
-          datePattern: 'YYYY-MM-DD-HH-mm',
+          datePattern: 'YYYY-MM-DD-HH',
           zippedArchive: true,
           maxSIze: '1m',
           maxFiles: '15d',
@@ -64,4 +64,4 @@ class MyLogger {
   }
 }
 
-module.exports = MyLogger.getInstance()
+module.exports = WinstonLogger.getInstance()

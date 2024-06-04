@@ -1,8 +1,8 @@
 const { Client, GatewayIntentBits } = require('discord.js')
-
+require('dotenv').config()
 DISCORD_TOKEN = process.env.DISCORD_TOKEN
-
 CHANNEL_ID = process.env.DISCORD_CHANNEL
+
 class DiscordLogger {
   static getDiscordLogger() {
     if (!this.discordInstance) this.discordInstance = new DiscordLogger()
@@ -20,29 +20,34 @@ class DiscordLogger {
 
     this.channelId = CHANNEL_ID
     this.client.on('ready', () => {
-      console.log('Discord oke')
+      console.log('Discord connected')
     })
     this.client.login(DISCORD_TOKEN)
   }
 
-  log({
-    level,
-    requestId,
-    context,
-    message,
-    timestamp = new Date(),
-    metadata = {},
-  }) {
-    console.log(this.channelId)
+  log(message, params) {
     const channel = this.client.channels.cache.get(this.channelId)
-    console.log(channel)
     if (!channel) {
       console.log('Not found channel discord')
       return
     }
     channel
       .send(
-        `${level}::${requestId}::${context}::${message}::${timestamp}::${JSON.stringify(metadata)}`,
+        `info::${params.requestId}::${params.context}::${message}::${new Date()}::${JSON.stringify(params.metadata)}`,
+      )
+      .catch((e) => {
+        console.log('error::', e)
+      })
+  }
+  error(message, params) {
+    const channel = this.client.channels.cache.get(this.channelId)
+    if (!channel) {
+      console.log('Not found channel discord')
+      return
+    }
+    channel
+      .send(
+        `error::${params.requestId}::${params.context}::${message}::${new Date()}::${JSON.stringify(params.metadata)}`,
       )
       .catch((e) => {
         console.log('error::', e)

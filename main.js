@@ -1,23 +1,22 @@
 'use strict'
 const express = require('express')
-const logger = require('./winston.log')
 const { v4: uuid4 } = require('uuid')
+const MainLogger = require('./logger')
+const winstonLog = require('./winston.log')
+const discordLog = require('./discord.log')
+require('dotenv').config()
 
 const app = express()
 const PORT = 8080
-const discordLogger = require('./discord.log.js')
+const mainLogger = new MainLogger()
+mainLogger.add(winstonLog)
+mainLogger.add(discordLog)
+// mainLogger.remove(discordLog)
 
 app.use((req, res, next) => {
   const requestId = req.headers['x-request-id']
   req.requestId = requestId ? requestId : uuid4()
-  discordLogger.log({
-    level: 'Info',
-    message: 'input params',
-    requestId: req.requestId,
-    context: req.path,
-    metadata: req.method === 'post' ? req.body : req.query,
-  })
-  logger.log('input params', {
+  mainLogger.log('input params', {
     context: req.path,
     requestId: req.requestId,
     metadata: req.method === 'post' ? req.body : req.query,
@@ -26,7 +25,7 @@ app.use((req, res, next) => {
 })
 
 app.get('/', (req, res, next) => {
-  logger.log('oke', {
+  mainLogger.log('oke', {
     context: req.path,
     requestId: req.requestId,
     metadata: 'Oke',
@@ -39,16 +38,9 @@ app.get('/error', (req, res, next) => {
 })
 
 app.use((error, req, res, next) => {
-  logger.error(error.message, {
+  mainLogger.error(error.message, {
     context: req.path,
     requestId: req.requestId,
-    metadata: req.method === 'post' ? req.body : req.query,
-  })
-  discordLogger.log({
-    level: 'error',
-    message: error.message,
-    requestId: req.requestId,
-    context: req.path,
     metadata: req.method === 'post' ? req.body : req.query,
   })
   res.send('fail')
